@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Realtime Data Dashboard</title>
+    <link rel="stylesheet" href="/css/adminlte.min.css">
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Navbar content here -->
+        </nav>
+        <!-- Sidebar -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Sidebar content here -->
+        </aside>
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3 id="rms-acceleration">0</h3>
+                                    <p>Overall RMS Acceleration (m/s²)</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3 id="velocity">0</h3>
+                                    <p>Velocity (mm/s)</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-wave-square"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3 id="displacement">0</h3>
+                                    <p>Displacement (du)</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-arrows-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- Footer -->
+        <footer class="main-footer">
+            <!-- Footer content here -->
+        </footer>
+    </div>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/adminlte.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        socket.on('data', function(data) {
+            document.getElementById('rms-acceleration').innerText = data.rmsAcceleration;
+            document.getElementById('velocity').innerText = data.velocity;
+            document.getElementById('displacement').innerText = data.displacement;
+        });
+    </script>
+</body>
+</html>
