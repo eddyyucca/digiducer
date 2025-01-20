@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Monitoring</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 50px auto;
+            max-width: 600px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .header {
+            background-color: #0078d7;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .card {
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f1f1f1;
+        }
+        .card h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 18px;
+            color: #0078d7;
+        }
+        footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PLTU ASAM-ASAM Monitoring</h1>
+        </div>
+        <div id="acceleration" class="card">
+            <h2>Overall RMS</h2>
+            <p id="acceleration-value">0.00</p>
+            <p>ACCELERATION (m/s²)</p>
+        </div>
+        <div id="velocity" class="card">
+            <h2>Overall RMS</h2>
+            <p id="velocity-value">0.00</p>
+            <p>VELOCITY (mm/s)</p>
+        </div>
+        <div id="demodulation" class="card">
+            <h2>Overall RMS</h2>
+            <p id="demodulation-value">0.00</p>
+            <p>DEMODULATION (du_m/s²)</p>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 PLTU ASAM-ASAM Engineering</p>
+    </footer>
+
+    <script>
+        async function fetchData() {
+            try {
+                // Fetch data from the server
+                const response = await fetch('/data');
+                const data = await response.json();
+
+                // Update acceleration value
+                document.getElementById('acceleration-value').innerText = data.acceleration;
+
+                // Update velocity value
+                document.getElementById('velocity-value').innerText = data.velocity;
+
+                // Update demodulation value
+                document.getElementById('demodulation-value').innerText = data.demodulation;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        // Fetch data every 1 second
+        setInterval(fetchData, 1000);
+        fetchData(); // Initial call to fetch data immediately
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+project-folder/
+├── app.py                 # File utama backend Flask
+├── requirements.txt       # Daftar pustaka Python yang diperlukan
+├── templates/             # Folder untuk file HTML
+│   └── index.html         # File frontend utama (Chart.js)
+├── static/                # Folder untuk file statis (CSS, JS, dll.)
+│   └── js/
+│       └── chart.js       # (Opsional) Chart.js library (jika diunduh secara manual)
+├── data/                  # (Opsional) Folder untuk menyimpan data mentah/log
+
+pip install -r requirements.txt
