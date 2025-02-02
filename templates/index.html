@@ -1,141 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real-Time Monitoring</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            margin: 50px auto;
-            max-width: 600px;
-            padding: 20px;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        .header {
-            background-color: #0078d7;
-            color: white;
-            padding: 20px;
-            border-radius: 8px 8px 0 0;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .card {
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background: #f1f1f1;
-        }
-        .card h2 {
-            margin: 0;
-            font-size: 20px;
-            color: #333;
-        }
-        .card p {
-            margin: 5px 0;
-            font-size: 18px;
-            color: #0078d7;
-        }
-        footer {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #666;
-        }
-    </style>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <script src="../static/js/chart.min.js"></script>
 </head>
+
 <body>
-      <!-- Main content of your dashboard -->
-    <h1>Realtime Data Dashboard</h1>
-
-    <!-- Hidden message for Inspect Element -->
-    <!-- 
-    # Author: Eddy Adha Saputra
-    # GitHub: https://github.com/eddyyucca
-    # Description: Realtime Data Dashboard with Flask
-    # This dashboard monitors real-time data from device 333D01, including Acceleration, Velocity, and Demodulation.
-
-    # Features
-    # - Realtime Monitoring: Displays acceleration, velocity, and demodulation data in real-time.
-    # - Flask Backend: Python-based backend using Flask.
-    # - Responsive Dashboard: User-friendly and responsive interface.
-
-   
-      _____     _      _                                                                       
-     | ____| __| |  __| | _   _  _   _  _   _   ___  __ _                                      
-     |  _|  / _` | / _` || | | || | | || | | | / __|/ _` |                                     
-     | |___| (_| || (_| || |_| || |_| || |_| || (__| (_| |                                     
-     |_____|\__,_| \__,_| \__, | \__, | \__,_| \___|\__,_|                                     
-                          |___/  |___/                                                       
-      _____  _              ____            _                                                
-     |_   _|| |__    ___   / ___| ___    __| |  ___                                          
-       | |  | '_ \  / _ \ | |    / _ \  / _` | / _ \                                         
-       | |  | | | ||  __/ | |___| (_) || (_| ||  __/                                         
-       |_|  |_| |_| \___|  \____|\___/  \__,_| \___|                                         
-                                            _          _    _                                _ 
-       ___  ___   _ __  _ __  _   _  _ __  | |_  ___  | |_ | |__    ___   ___   ___   _   _ | |
-      / __|/ _ \ | '__|| '__|| | | || '_ \ | __|/ __| | __|| '_ \  / _ \ / __| / _ \ | | | || |
-     | (__| (_) || |   | |   | |_| || |_) || |_ \__ \ | |_ | | | ||  __/ \__ \| (_) || |_| || |
-      \___|\___/ |_|   |_|    \__,_|| .__/  \__||___/  \__||_| |_| \___| |___/ \___/  \__,_||_|
-                                  |_|                                                        
-    -->
     <div class="container">
         <div class="header">
             <h1>PLTU ASAM-ASAM Monitoring</h1>
+             <div class="button-group">
+                <button id="save-button">Ambil Sampel</button>
+                <a href="/view-data" class="view-data-button">Lihat Data</a>
+            </div>
         </div>
-        <div id="acceleration" class="card">
-            <h2>Overall RMS</h2>
-            <p id="acceleration-value">0.00</p>
-            <p>ACCELERATION (m/s²)</p>
+
+        <!-- Chart Sections -->
+        <div class="chart-section">
+            <h2>Acceleration (m/s²)</h2>
+            <canvas id="accelerationChart"></canvas>
+            <p class="current-value" id="accelerationValue">Current Value: 0.00</p>
         </div>
-        <div id="velocity" class="card">
-            <h2>Overall RMS</h2>
-            <p id="velocity-value">0.00</p>
-            <p>VELOCITY (mm/s)</p>
+        <div class="chart-section">
+            <h2>Velocity (mm/s)</h2>
+            <canvas id="velocityChart"></canvas>
+            <p class="current-value" id="velocityValue">Current Value: 0.00</p>
         </div>
-        <div id="demodulation" class="card">
-            <h2>Overall RMS</h2>
-            <p id="demodulation-value">0.00</p>
-            <p>DEMODULATION (du_m/s²)</p>
+        <div class="chart-section">
+            <h2>Demodulation (du_m/s²)</h2>
+            <canvas id="demodulationChart"></canvas>
+            <p class="current-value" id="demodulationValue">Current Value: 0.00</p>
         </div>
     </div>
+
     <footer>
         <p>&copy; 2025 PLTU ASAM-ASAM Engineering</p>
     </footer>
 
     <script>
+        // Button to save data
+        document.getElementById("save-button").addEventListener("click", async () => {
+            try {
+                const response = await fetch("/data", { method: "POST" });
+                const result = await response.json();
+                alert(
+                    `Data Tersimpan:\nWaktu: ${result.timestamp}\nAcceleration: ${result.acceleration.toFixed(2)}\nVelocity: ${result.velocity.toFixed(2)}\nDemodulation: ${result.demodulation.toFixed(2)}`
+                );
+            } catch (error) {
+                console.error("Error saving data:", error);
+            }
+        });
+
+        // Initialize charts
+        const accelerationChart = new Chart(document.getElementById('accelerationChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Acceleration (m/s²)',
+                    data: [],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Time' } },
+                    y: { title: { display: true, text: 'Acceleration (m/s²)' } }
+                }
+            }
+        });
+
+        const velocityChart = new Chart(document.getElementById('velocityChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Velocity (mm/s)',
+                    data: [],
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Time' } },
+                    y: { title: { display: true, text: 'Velocity (mm/s)' } }
+                }
+            }
+        });
+
+        const demodulationChart = new Chart(document.getElementById('demodulationChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Demodulation (du_m/s²)',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Time' } },
+                    y: { title: { display: true, text: 'Demodulation (du_m/s²)' } }
+                }
+            }
+        });
+
+        // Update charts dynamically
         async function fetchData() {
             try {
-                // Fetch data from the server
                 const response = await fetch('/data');
                 const data = await response.json();
 
-                // Update acceleration value
-                document.getElementById('acceleration-value').innerText = data.acceleration;
+                const timestamp = new Date().toLocaleTimeString();
 
-                // Update velocity value
-                document.getElementById('velocity-value').innerText = data.velocity;
+                // Update acceleration chart and value
+                updateChart(accelerationChart, timestamp, data.acceleration, 'accelerationValue');
 
-                // Update demodulation value
-                document.getElementById('demodulation-value').innerText = data.demodulation;
+                // Update velocity chart and value
+                updateChart(velocityChart, timestamp, data.velocity, 'velocityValue');
+
+                // Update demodulation chart and value
+                updateChart(demodulationChart, timestamp, data.demodulation, 'demodulationValue');
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         }
 
-        // Fetch data every 1 second
+        // Helper function to update a chart and its value
+        function updateChart(chart, timestamp, value, valueElementId) {
+            chart.data.labels.push(timestamp);
+            chart.data.datasets[0].data.push(value);
+
+            // Keep only the last 20 data points
+            if (chart.data.labels.length > 20) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+
+            chart.update();
+            document.getElementById(valueElementId).innerText = `Current Value: ${value.toFixed(2)}`;
+        }
+
+        // Fetch data every second
         setInterval(fetchData, 1000);
-        fetchData(); // Initial call to fetch data immediately
+        fetchData(); // Initial call to fetch data
     </script>
 </body>
+
 </html>
